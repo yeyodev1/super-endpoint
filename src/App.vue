@@ -1,47 +1,33 @@
-<script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
+<script setup>
+import { computed, onMounted } from 'vue';
+
+import useGenericDataStore from '@/store/genericDataStore';
+
+const dataStore = useGenericDataStore();
+
+const posts = computed(() => dataStore.posts);
+const isLoading = computed(() => dataStore.isLoading);
+
+onMounted(async () => {
+  try {
+    await dataStore.fetchPosts(); 
+  } catch (error) {
+    console.error('error getting posts: ', error);
+  }
+});
 </script>
 
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
+  <div>
+    <h1>Estoy aprendiendo a usar endpoints como un profesional</h1>
+    <div v-if="isLoading">
+      Cargando posts...
     </div>
-  </header>
-
-  <main>
-    <TheWelcome />
-  </main>
+    <div v-else>
+      <div v-for="post in posts" :key="post.id">
+        <h3>{{ post.title }}</h3>
+        <p>{{ post.body }}</p>
+      </div>
+    </div>
+  </div>
 </template>
-
-<style scoped>
-header {
-  line-height: 1.5;
-}
-
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-}
-</style>
